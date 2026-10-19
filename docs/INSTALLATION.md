@@ -39,7 +39,7 @@ Si un pont est déjà installé, l’installateur s’arrête pour préserver se
 5. Copiez uniquement `Reader.exe`, `Reader.cs` et `settings.json` du nouveau dossier `payload` vers `%USERPROFILE%\.codex\tools\claude-reader`, en remplaçant ces fichiers.
 6. Lancez `Reprendre.cmd` dans le dossier installé.
 
-Cette mise à jour active le transfert en arrière-plan. Vos fichiers de conversation et de file d’attente restent en place.
+Cette mise à jour rétablit l’attente du premier plan. Vos fichiers de conversation et de file d’attente restent en place.
 
 ## 3. Choisir la conversation Claude
 
@@ -48,7 +48,7 @@ Cette mise à jour active le transfert en arrière-plan. Vos fichiers de convers
 3. Dans l’onglet Chat, ouvrez une conversation existante. Vous pouvez créer vous-même une conversation dédiée avant cette étape.
 4. Vérifiez qu’aucun brouillon personnel, génération ou lecture audio n’est en cours.
 5. Demandez une nouvelle réponse à Codex Desktop après le démarrage du pont.
-6. Laissez cette conversation ouverte. Le paquet permet le transfert avec Claude en arrière-plan ; Claude peut reprendre le premier plan pendant l’envoi.
+6. Placez cette conversation au premier plan pour permettre le transfert. En arrière-plan, le pont attend sans agir sur Claude.
 
 Au premier transfert, le pont enregistre l’URL de cette conversation dans `conversation.txt`. Les transferts suivants attendent que vous ouvriez cette même conversation. Le pont ne crée pas de chat et ne sélectionne pas de conversation à votre place.
 
@@ -60,15 +60,15 @@ Une fois la réponse de Claude terminée, cliquez sur **« Lire à voix haute »
 
 Le pont surveille les nouvelles réponses finales de toutes les conversations Codex Desktop enregistrées dans le dossier de sessions Windows standard. Il ignore l’historique antérieur à son démarrage et les messages des sous-agents.
 
-Le paquet active le transfert en arrière-plan avec ce fichier `settings.json` dans le dossier d’installation :
+Le paquet attend le premier plan avec ce fichier `settings.json` dans le dossier d’installation :
 
 ```json
-{ "allowBackground": true }
+{ "allowBackground": false }
 ```
 
-Claude doit rester ouvert sur la conversation retenue. Le pont utilise ses contrôles d’accessibilité ; Claude peut reprendre le premier plan pendant l’envoi. Le fonctionnement avec une fenêtre réduite dépend de ces contrôles.
+Claude doit être au premier plan sur la conversation retenue. En arrière-plan, le pont attend sans agir sur Claude.
 
-Remplacez `true` par `false`, ou retirez `settings.json`, pour rétablir l’attente du premier plan. Le réglage est relu à chaque tentative, sans redémarrage.
+L’option `true` autorise explicitement le transfert en arrière-plan, mais Claude peut alors reprendre le premier plan pendant l’envoi. Retirer `settings.json` conserve l’attente du premier plan. Le réglage est relu à chaque tentative, sans redémarrage.
 
 Si Claude est fermé, occupé ou ouvert sur un autre chat, les réponses restent en attente. Le transfert reprend automatiquement lorsque vous ouvrez vous-même la bonne conversation dans les conditions requises.
 
