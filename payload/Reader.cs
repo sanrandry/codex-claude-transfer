@@ -18,6 +18,7 @@ internal static class Reader
     private static string directory;
     private static IntPtr window;
     private static string chosenConversation;
+    private static bool allowBackground;
     private static readonly JavaScriptSerializer Json = new JavaScriptSerializer { MaxJsonLength = 16 * 1024 * 1024 };
 
     private sealed class DeferredException : Exception
@@ -27,7 +28,7 @@ internal static class Reader
 
     private static void RequireForeground()
     {
-        if (GetForegroundWindow() != window)
+        if (!allowBackground && GetForegroundWindow() != window)
             throw new DeferredException("Ouvrir soi-meme Claude pour transferer les reponses en attente.");
     }
 
@@ -162,11 +163,23 @@ internal static class Reader
                 string testPrompt = Prompt(syntheticText, "lecture-neutre");
                 var payload = Json.Deserialize<Dictionary<string, string>>(testPrompt.Substring(testPrompt.IndexOf("{", StringComparison.Ordinal)));
                 if (payload["texte"] != syntheticText || payload["lecture_id"] != "lecture-neutre") throw new Exception("JSON round trip failed.");
+                window = new IntPtr(-1);
+                bool deferred = false;
+                try { RequireForeground(); }
+                catch (DeferredException) { deferred = true; }
+                if (!deferred) throw new Exception("Foreground guard must defer by default.");
+                allowBackground = true;
+                RequireForeground();
                 Console.WriteLine("self-test-ok");
                 return 0;
             }
             if (args.Length != 1) throw new ArgumentException("Fichier de lecture requis.");
             directory = Path.GetDirectoryName(Path.GetFullPath(args[0]));
+            string settingsFile = Path.Combine(directory, "settings.json");
+            if (File.Exists(settingsFile)) {
+                var settings = Json.Deserialize<Dictionary<string, bool>>(File.ReadAllText(settingsFile, Encoding.UTF8));
+                allowBackground = settings != null && settings.ContainsKey("allowBackground") && settings["allowBackground"];
+            }
             var input = Json.Deserialize<Dictionary<string, string>>(File.ReadAllText(args[0], Encoding.UTF8));
             string text = input["texte"];
             if (String.IsNullOrWhiteSpace(text)) throw new ArgumentException("Texte vide.");
@@ -177,7 +190,7 @@ internal static class Reader
                 .Where(handle => handle != IntPtr.Zero && GetAncestor(handle, 2) == handle).Distinct().ToList();
             if (windows.Count != 1) throw new DeferredException("Une seule fenetre Claude ouverte est requise.");
             window = windows[0];
-            // Never ask a background window's controls to perform an action.
+            // Background actions require explicit opt-in in settings.json.
             RequireForeground();
             var existing = Elements();
             string conversationUrl = ConversationUrl(existing);

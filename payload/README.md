@@ -2,7 +2,17 @@
 
 Le pont surveille les nouvelles réponses finales de Codex Desktop. Il réutilise une conversation Claude existante, puis lui demande de reproduire le texte. Il ne crée aucun chat. La lecture reste manuelle : cliquer sur « Lire à voix haute » dans Claude. Les messages des sous-agents et l'historique antérieur au démarrage sont ignorés, y compris après réécriture ou compaction d'un journal.
 
-Le pont démarre maintenant et à l'ouverture de session Windows. Chaque réponse transférée utilise une requête Claude. Aucun premier plan, clavier, presse-papiers ou lancement de lecture automatique : seuls les contrôles d'accessibilité sont utilisés. Pour empêcher leur activation involontaire par l'application, ces contrôles ne sont actionnés que lorsque l'utilisateur a déjà placé Claude au premier plan. Les réponses attendent dans la file lorsque Claude est en arrière-plan, réduit ou fermé. La reproduction du texte dépend du modèle Claude sélectionné ; elle n'est pas une garantie de transcription exacte.
+Le pont démarre après installation et à l'ouverture de session Windows. Chaque réponse transférée utilise une requête Claude. Seuls les contrôles d'accessibilité sont utilisés, sans saisie clavier, presse-papiers ni lancement de lecture automatique. Le paquet active le transfert lorsque Claude est en arrière-plan. Claude peut reprendre le premier plan pendant l'envoi ; le fonctionnement avec une fenêtre réduite dépend de ses contrôles d'accessibilité. Si Claude est fermé, les réponses attendent dans la file. La reproduction du texte dépend du modèle Claude sélectionné ; elle n'est pas une garantie de transcription exacte.
+
+## Transfert en arrière-plan
+
+Le paquet installe ce fichier `settings.json` :
+
+```json
+{ "allowBackground": true }
+```
+
+Remplacer `true` par `false`, ou retirer ce fichier, pour rétablir l'attente du premier plan. Le réglage est relu à chaque tentative, sans redémarrage du pont. Claude doit rester ouvert sur la conversation retenue ; les protections des brouillons et de la génération ou lecture en cours restent actives.
 
 Ouvrir soi-même une conversation existante dans l'onglet Claude/Chat. Au premier transfert, son URL est retenue dans `conversation.txt` : les transferts suivants utilisent uniquement cette conversation. Si un autre chat est affiché, les réponses attendent le retour dans le chat retenu. Le pont ne lance, ne restaure et ne sélectionne aucune conversation. Les brouillons personnels, la génération en cours et la lecture audio en cours font également attendre le transfert.
 
@@ -21,10 +31,11 @@ Le statut se consulte avec `node bridge.mjs --status` ; `waiting` indique la rai
 
 - Le `notify` existant de Codex reste intact.
 - Bibliothèques Windows et Node déjà installés ; aucun téléchargement ni clé API.
+- L'installateur compile `Reader.exe` depuis `Reader.cs` avec le compilateur .NET Framework Windows.
 - `Reader.cs` utilise Windows UI Automation, sans lien ouvrant l'application au premier plan.
 - Le format des journaux locaux est celui vérifié lors de l'installation ; une évolution de Codex ou de l'interface Claude peut nécessiter une adaptation.
 - Démarrage automatique : raccourci `Codex vers Claude.lnk` dans le dossier Windows `shell:startup`. Retirer ce raccourci, puis lancer `Arreter.cmd`, pour désactiver durablement le pont.
 
 ## Vérification
 
-`node --test watch.test.mjs background.test.mjs` vérifie l'exclusion de l'historique, la déduplication, les sous-agents, les lignes UTF-8 partielles et l'absence des appels d'activation, de création de chat et de lecture automatique. `Reader.exe --self-test` vérifie la conservation du texte dans le message JSON. Le garde de premier plan a été vérifié avec Claude en arrière-plan : le transfert est différé sans action sur l'application.
+`node --test watch.test.mjs background.test.mjs` vérifie l'exclusion de l'historique, la déduplication, les sous-agents, les lignes UTF-8 partielles et l'absence des appels d'activation, de création de chat et de lecture automatique. `Reader.exe --self-test` vérifie la conservation du texte dans le message JSON et le garde de premier plan dans les deux modes, sans action sur Claude. Ces vérifications ne garantissent pas le maintien du focus ni la compatibilité avec chaque version de Claude Desktop.
