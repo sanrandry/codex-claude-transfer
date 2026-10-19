@@ -2,17 +2,17 @@
 
 Le pont surveille les nouvelles réponses finales de Codex Desktop. Il réutilise une conversation Claude existante, puis lui demande de reproduire le texte. Il ne crée aucun chat. La lecture reste manuelle : cliquer sur « Lire à voix haute » dans Claude. Les messages des sous-agents et l'historique antérieur au démarrage sont ignorés, y compris après réécriture ou compaction d'un journal.
 
-Le pont démarre après installation et à l'ouverture de session Windows. Chaque réponse transférée utilise une requête Claude. Seuls les contrôles d'accessibilité sont utilisés, sans saisie clavier, presse-papiers ni lancement de lecture automatique. Le paquet active le transfert lorsque Claude est en arrière-plan. Claude peut reprendre le premier plan pendant l'envoi ; le fonctionnement avec une fenêtre réduite dépend de ses contrôles d'accessibilité. Si Claude est fermé, les réponses attendent dans la file. La reproduction du texte dépend du modèle Claude sélectionné ; elle n'est pas une garantie de transcription exacte.
+Le pont démarre après installation et à l'ouverture de session Windows. Chaque réponse transférée utilise une requête Claude. Seuls les contrôles d'accessibilité sont utilisés, sans saisie clavier, presse-papiers ni lancement de lecture automatique. Le paquet attend que vous placiez Claude au premier plan avant le transfert. En arrière-plan, aucune action n'est effectuée sur Claude. Si Claude est fermé, les réponses attendent dans la file. La reproduction du texte dépend du modèle Claude sélectionné ; elle n'est pas une garantie de transcription exacte.
 
-## Transfert en arrière-plan
+## Attente du premier plan
 
 Le paquet installe ce fichier `settings.json` :
 
 ```json
-{ "allowBackground": true }
+{ "allowBackground": false }
 ```
 
-Remplacer `true` par `false`, ou retirer ce fichier, pour rétablir l'attente du premier plan. Le réglage est relu à chaque tentative, sans redémarrage du pont. Claude doit rester ouvert sur la conversation retenue ; les protections des brouillons et de la génération ou lecture en cours restent actives.
+L'option `true` autorise explicitement le transfert en arrière-plan, mais Claude peut alors reprendre le premier plan pendant l'envoi. Retirer ce fichier conserve l'attente du premier plan. Le réglage est relu à chaque tentative, sans redémarrage du pont. Claude doit être au premier plan sur la conversation retenue ; les protections des brouillons et de la génération ou lecture en cours restent actives.
 
 Ouvrir soi-même une conversation existante dans l'onglet Claude/Chat. Au premier transfert, son URL est retenue dans `conversation.txt` : les transferts suivants utilisent uniquement cette conversation. Si un autre chat est affiché, les réponses attendent le retour dans le chat retenu. Le pont ne lance, ne restaure et ne sélectionne aucune conversation. Les brouillons personnels, la génération en cours et la lecture audio en cours font également attendre le transfert.
 
