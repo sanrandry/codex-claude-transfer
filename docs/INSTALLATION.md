@@ -30,7 +30,16 @@ Le dossier d’installation est :
 
 L’installateur utilise les chemins du PC qui l’exécute. Il compile d'abord `payload/Reader.cs` avec le compilateur .NET Framework Windows pour produire `payload/Reader.exe`. Il crée ensuite un raccourci **`Codex vers Claude.lnk`** dans le dossier de démarrage Windows et lance le pont en arrière-plan. Il ne modifie pas le fichier de configuration de Codex ni sa commande `notify`.
 
-Si un pont est déjà installé, l’installateur s’arrête pour préserver ses fichiers. N’effacez pas une installation active : suivez d’abord la procédure de désinstallation ci-dessous pour la remplacer.
+Si un pont est déjà installé, l’installateur s’arrête pour préserver ses fichiers. Pour appliquer cette mise à jour :
+
+1. Lancez `Arreter.cmd` dans le dossier installé.
+2. Attendez que `bridge.pid` disparaisse de ce dossier.
+3. Téléchargez et extrayez le nouveau paquet dans un autre dossier.
+4. Depuis PowerShell, dans le nouveau dossier extrait, lancez `node install.mjs --check`. Cette commande compile le programme et le vérifie sans installer ni envoyer de message.
+5. Copiez uniquement `Reader.exe`, `Reader.cs` et `settings.json` du nouveau dossier `payload` vers `%USERPROFILE%\.codex\tools\claude-reader`, en remplaçant ces fichiers.
+6. Lancez `Reprendre.cmd` dans le dossier installé.
+
+Cette mise à jour active le transfert en arrière-plan. Vos fichiers de conversation et de file d’attente restent en place.
 
 ## 3. Choisir la conversation Claude
 
@@ -39,7 +48,7 @@ Si un pont est déjà installé, l’installateur s’arrête pour préserver se
 3. Dans l’onglet Chat, ouvrez une conversation existante. Vous pouvez créer vous-même une conversation dédiée avant cette étape.
 4. Vérifiez qu’aucun brouillon personnel, génération ou lecture audio n’est en cours.
 5. Demandez une nouvelle réponse à Codex Desktop après le démarrage du pont.
-6. Revenez vous-même dans la conversation Claude et laissez-la au premier plan le temps du transfert.
+6. Laissez cette conversation ouverte. Le paquet permet le transfert avec Claude en arrière-plan ; Claude peut reprendre le premier plan pendant l’envoi.
 
 Au premier transfert, le pont enregistre l’URL de cette conversation dans `conversation.txt`. Les transferts suivants attendent que vous ouvriez cette même conversation. Le pont ne crée pas de chat et ne sélectionne pas de conversation à votre place.
 
@@ -51,7 +60,17 @@ Une fois la réponse de Claude terminée, cliquez sur **« Lire à voix haute »
 
 Le pont surveille les nouvelles réponses finales de toutes les conversations Codex Desktop enregistrées dans le dossier de sessions Windows standard. Il ignore l’historique antérieur à son démarrage et les messages des sous-agents.
 
-Si Claude est en arrière-plan, réduit, fermé, occupé ou ouvert sur un autre chat, les réponses restent en attente. Le transfert reprend automatiquement lorsque vous ouvrez vous-même la bonne conversation dans les conditions requises. Le pont ne doit pas demander le premier plan à Windows.
+Le paquet active le transfert en arrière-plan avec ce fichier `settings.json` dans le dossier d’installation :
+
+```json
+{ "allowBackground": true }
+```
+
+Claude doit rester ouvert sur la conversation retenue. Le pont utilise ses contrôles d’accessibilité ; Claude peut reprendre le premier plan pendant l’envoi. Le fonctionnement avec une fenêtre réduite dépend de ces contrôles.
+
+Remplacez `true` par `false`, ou retirez `settings.json`, pour rétablir l’attente du premier plan. Le réglage est relu à chaque tentative, sans redémarrage.
+
+Si Claude est fermé, occupé ou ouvert sur un autre chat, les réponses restent en attente. Le transfert reprend automatiquement lorsque vous ouvrez vous-même la bonne conversation dans les conditions requises.
 
 Les fichiers de commande se trouvent dans le dossier d’installation. Pour l’ouvrir : **Windows + R**, puis saisissez :
 
