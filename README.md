@@ -3,7 +3,7 @@
 Un petit pont Windows pour envoyer les nouvelles réponses finales de Codex Desktop dans une conversation Claude Desktop existante, puis les écouter avec le bouton « Lire à voix haute » de Claude.
 
 - Réutilise la même conversation Claude.
-- N’ouvre pas Claude et ne le met pas au premier plan : les réponses attendent jusqu’à ce que vous ouvriez vous-même la conversation choisie.
+- Transfère aussi lorsque Claude est en arrière-plan, ouvert sur la conversation choisie. Claude peut reprendre le premier plan pendant l’envoi.
 - Laisse la lecture audio manuelle.
 - Ignore l’historique antérieur au démarrage et les messages des sous-agents.
 - Ne modifie pas la configuration `notify` de Codex.
@@ -17,9 +17,11 @@ Prérequis : Windows 10/11, Node.js 18 ou supérieur dans le `PATH`, .NET Framew
 3. Ouvrez Codex Desktop et créez une première conversation si nécessaire.
 4. Dans le dossier extrait, double-cliquez sur **`Installer.cmd`**, sans droits administrateur.
 5. Ouvrez vous-même une conversation Claude existante, dans l’onglet Chat, puis demandez une nouvelle réponse à Codex.
-6. Gardez cette conversation Claude visible au premier plan pour laisser passer le transfert. Une fois la réponse de Claude terminée, cliquez sur **« Lire à voix haute »**.
+6. Laissez cette conversation ouverte ; Claude peut rester en arrière-plan. Une fois la réponse de Claude terminée, cliquez sur **« Lire à voix haute »**.
 
 La conversation affichée au premier transfert devient la destination des suivants. L’installateur place le pont dans `%USERPROFILE%\.codex\tools\claude-reader` et configure son démarrage à l’ouverture de session Windows. Aucun `npm install`, compte développeur ni jeton API à fournir.
+
+Le paquet active le transfert en arrière-plan avec `"allowBackground": true` dans `settings.json`. Remplacez `true` par `false`, ou retirez ce fichier du dossier installé, pour attendre que vous placiez Claude au premier plan. Le réglage est relu à chaque tentative. Le fonctionnement avec une fenêtre réduite dépend des contrôles d’accessibilité de Claude.
 
 Le [manuel d’installation](docs/INSTALLATION.md) détaille la configuration, les commandes, les erreurs et la désinstallation.
 

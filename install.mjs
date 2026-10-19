@@ -8,7 +8,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 const source = path.join(path.dirname(fileURLToPath(import.meta.url)), 'payload');
 const repository = path.dirname(fileURLToPath(import.meta.url));
 const destination = path.join(os.homedir(), '.codex/tools/claude-reader');
-const names = ['bridge.mjs', 'watch.mjs', 'watch.test.mjs', 'background.test.mjs', 'Reader.cs', 'Reader.exe', 'README.md'];
+const names = ['bridge.mjs', 'watch.mjs', 'watch.test.mjs', 'background.test.mjs', 'Reader.cs', 'Reader.exe', 'README.md', 'settings.json'];
 const vbsString = value => '"' + value.replaceAll('"', '""') + '"';
 const quoted = value => '"' + value + '"';
 
